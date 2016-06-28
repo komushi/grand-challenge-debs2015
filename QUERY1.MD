@@ -12,4 +12,67 @@ The attribute “delay” captures the time delay between reading the input even
 
 The cells for this query are squares of 500 m X 500 m. The cell grid starts with cell 1.1, located at 41.474937, -74.913585 (in Barryville). The coordinate 41.474937, -74.913585 marks the center of the first cell. Cell numbers increase towards the east and south, with the shift to east being the first and the shift to south the second component of the cell, i.e., cell 3.7 is 2 cells east and 6 cells south of cell 1.1. The overall grid expands 150km south and 150km east from cell 1.1 with the cell 300.300 being the last cell in the grid. All trips starting or ending outside this area are treated as outliers and must not be considered in the result computation.
 
-# Steps
+# 1. Local Deployment Architecture 
+ 
+
+
+# 2. Local Deployment Steps 
+
+## 2-1. Prerequisites for local
+
+* [Maven](http://brewformulas.org/Maven)
+* [Spring Cloud Data Flow Local Server](http://repo.spring.io/libs-milestone/org/springframework/cloud/spring-cloud-dataflow-server-local/1.0.0.RC1/spring-cloud-dataflow-server-local-1.0.0.RC1.jar)
+* [Spring Cloud Data Flow Shell](http://repo.spring.io/libs-milestone/org/springframework/cloud/spring-cloud-dataflow-shell/1.0.0.RC1/spring-cloud-dataflow-shell-1.0.0.RC1.jar)
+* [RabbitMQ](http://brewformulas.org/Rabbitmq)
+
+## 2-2. Start Data Flow Server and Shell
+
+### 2-2-1. Start RabbitMQ
+
+```
+rabbitmq-server
+```
+
+### 2-2-2. Start Data Flow Server
+
+```
+java -jar spring-cloud-dataflow-server-local-1.0.0.RC1.jar --binder=rabbit
+```
+
+### 2-2-3. Start Data Flow Shell
+
+```
+java -jar spring-cloud-dataflow-shell-1.0.0.RC1.jar
+```
+
+## 2-3. Stream to transfer data from simulator to GemFire 
+
+### 2-3-1. Register HTTP Source
+
+In Dataflow Shell
+
+```
+app unregister --name http:source
+
+app register --name http --type source --uri http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/http-source-rabbit/1.0.0.RC1/http-source-rabbit-1.0.0.RC1.jar
+```
+
+### 2-3-2. Register Flat2Tuple Processor
+
+```
+app unregister --name flat2tuple:processor
+
+app register --name flat2tuple --type processor --uri https://rawgit.com/komushi/spring-cloud-stream/master/Flat2TupleTransformer-0.0.1-SNAPSHOT.jar
+```
+
+### 2-3-3. Register GemFire Sink
+
+```
+app unregister --name flat2tuple:processor
+
+app register --name flat2tuple --type processor --uri https://rawgit.com/komushi/spring-cloud-stream/master/Flat2TupleTransformer-0.0.1-SNAPSHOT.jar
+```
+
+```
+stream create http2gem --definition "http --server.port=9000 | flat2tuple --outputType=application/json | gemfire --regionName=RegionRaw --json=true --keyExpression=payload.getField('uuid')" --deploy
+```
