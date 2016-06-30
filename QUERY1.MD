@@ -12,42 +12,41 @@ The attribute “delay” captures the time delay between reading the input even
 
 The cells for this query are squares of 500 m X 500 m. The cell grid starts with cell 1.1, located at 41.474937, -74.913585 (in Barryville). The coordinate 41.474937, -74.913585 marks the center of the first cell. Cell numbers increase towards the east and south, with the shift to east being the first and the shift to south the second component of the cell, i.e., cell 3.7 is 2 cells east and 6 cells south of cell 1.1. The overall grid expands 150km south and 150km east from cell 1.1 with the cell 300.300 being the last cell in the grid. All trips starting or ending outside this area are treated as outliers and must not be considered in the result computation.
 
-# 1. Local Deployment Architecture 
- 
 
+# 1. Local Deployment
 
-# 2. Local Deployment Steps 
+## TODO: Local Deployment Architecture
 
-## 2-1. Prerequisites for local
+## 1-1. Prerequisites for Local Deployment
 
 * [Maven](http://brewformulas.org/Maven)
 * [Spring Cloud Data Flow Local Server](http://repo.spring.io/libs-milestone/org/springframework/cloud/spring-cloud-dataflow-server-local/1.0.0.RC1/spring-cloud-dataflow-server-local-1.0.0.RC1.jar)
 * [Spring Cloud Data Flow Shell](http://repo.spring.io/libs-milestone/org/springframework/cloud/spring-cloud-dataflow-shell/1.0.0.RC1/spring-cloud-dataflow-shell-1.0.0.RC1.jar)
 * [RabbitMQ](http://brewformulas.org/Rabbitmq)
 
-## 2-2. Start Data Flow Server and Shell
+## 1-2. Start Data Flow Server and Shell
 
-### 2-2-1. Start RabbitMQ
+### 1-2-1. Start RabbitMQ
 
 ```
 rabbitmq-server
 ```
 
-### 2-2-2. Start Data Flow Server
+### 1-2-2. Start Data Flow Server
 
 ```
 java -jar spring-cloud-dataflow-server-local-1.0.0.RC1.jar --binder=rabbit
 ```
 
-### 2-2-3. Start Data Flow Shell
+### 1-2-3. Start Data Flow Shell
 
 ```
 java -jar spring-cloud-dataflow-shell-1.0.0.RC1.jar
 ```
 
-## 2-3. Stream to transfer data from simulator to GemFire 
+## 1-3. Register Spring Cloud Stream Apps to Data Flow Server (Sending data to GemFire)
 
-### 2-3-1. Register HTTP Source
+### 1-3-1. Register HTTP Source
 
 In Dataflow Shell
 
@@ -57,22 +56,100 @@ app unregister --name http:source
 app register --name http --type source --uri http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/http-source-rabbit/1.0.0.RC1/http-source-rabbit-1.0.0.RC1.jar
 ```
 
-### 2-3-2. Register Flat2Tuple Processor
+Or you can build the HTTP Source from source code.
+https://github.com/spring-cloud/spring-cloud-stream-app-starters
+
+### 1-3-2. Register Flat2Tuple Processor
 
 ```
 app unregister --name flat2tuple:processor
 
-app register --name flat2tuple --type processor --uri https://rawgit.com/komushi/spring-cloud-stream/master/Flat2TupleTransformer-0.0.1-SNAPSHOT.jar
+app register --name flat2tuple --type processor --uri https://rawgit.com/komushi/spring-cloud-stream/master/spring-cloud-stream-processor-flat2tuple-0.0.1-SNAPSHOT.jar
 ```
+Or you can build the HTTP Source from source code.
+https://github.com/komushi/spring-cloud-stream-processor-flat2tuple
 
-### 2-3-3. Register GemFire Sink
-
-```
-app unregister --name flat2tuple:processor
-
-app register --name flat2tuple --type processor --uri https://rawgit.com/komushi/spring-cloud-stream/master/Flat2TupleTransformer-0.0.1-SNAPSHOT.jar
-```
+### 1-3-3. Register GemFire Sink
 
 ```
-stream create http2gem --definition "http --server.port=9000 | flat2tuple --outputType=application/json | gemfire --regionName=RegionRaw --json=true --keyExpression=payload.getField('uuid')" --deploy
+app unregister --name gemfire:sink
+
+app register --name gemfire --type sink --uri http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/gemfire-sink-rabbit/1.0.0.RC1/gemfire-sink-rabbit-1.0.0.RC1.jar
+```
+
+Or you can build the GemFire Sink from source code.
+https://github.com/spring-cloud/spring-cloud-stream-app-starters
+
+## 1-4. Register Spring Cloud Stream Apps to Data Flow Server (Receiving data from GemFire)
+
+### 1-4-1 Register GemFire Source
+
+```
+app unregister --name gemfire:source
+
+app register --name gemfire --type source --uri http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/gemfire-source-rabbit/1.0.0.RC1/gemfire-source-rabbit-1.0.0.RC1.jar
+```
+
+Or you can build the GemFire Sink from source code.
+https://github.com/spring-cloud/spring-cloud-stream-app-starters
+
+### 1-4-2 Register Stomp Sink
+
+```
+app unregister --name stomp:sink
+
+app register --name stomp --type sink --uri https://rawgit.com/komushi/spring-cloud-stream/master/StompSink-0.0.1-SNAPSHOT.jar
+```
+
+Or you can build the GemFire Sink from source code.
+https://github.com/komushi/spring-cloud-stream-sink-stomp
+
+## 1-5 Start GemFire
+
+Several options for GemFire
+
+* [Embedded as Spring Boot App](https://github.com/komushi/spring-boot-gemfire-server)
+* [Official](http://gemfire.docs.pivotal.io/docs-gemfire/getting_started/15_minute_quickstart_gfsh.html)
+
+Here I will help you go through the steps with GemFire embedded as Spring Boot App.
+
+### 1-5-1. Download & Build
+
+```
+git clone https://github.com/komushi/spring-boot-gemfire-server.git
+cd spring-boot-gemfire-server
+mvn clean package -DskipTests
+```
+
+### 1-5-2. Patch
+
+Check details from https://github.com/komushi/spring-boot-gemfire-server
+
+```
+./patch-jar.sh
+```
+
+### 1-5-3. Start GemFire as Spring Boot App
+
+```
+java -jar target/spring-boot-gemfire-server-0.0.1-SNAPSHOT.jar
+```
+
+## 1-6. Create Stream on Spring Data Flow Server
+
+## 1-6-1 Receive data from HTTP and send to GemFire
+
+```
+stream create http2gem --definition "http --server.port=9000 | flat2tuple --outputType=application/json | gemfire --gemfire.region.regionName=RegionRaw --gemfire.json=true --gemfire.keyExpression=payload.getField('uuid')" --deploy
+```
+
+## 1-6-2 Receive data from GemFire and send to Stomp(WebSocket)
+
+```
+stream create gem2stomp --definition "gemfire --gemfire.region.region-name=RegionTopTen | stomp --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE" --deploy
+```
+
+## 1-7. Start Browser
+
+```
 ```
