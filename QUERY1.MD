@@ -181,14 +181,19 @@ java -jar http-source-rabbit-1.0.0.RC1.jar --server.port=9000 --spring.cloud.str
 ### 2-3-2. Start Flat2Tuple Processor
 
 ```
-java -jar target/spring-cloud-stream-processor-flat2tuple-0.0.1-SNAPSHOT.jar --server.port=9090 --outputType=application/json --spring.cloud.stream.bindings.output.destination=tuple2gem --spring.cloud.stream.bindings.input.destination=http2tuple
+java -jar spring-cloud-stream-processor-flat2tuple-0.0.1-SNAPSHOT.jar --server.port=9090 --spring.cloud.stream.bindings.input.destination=http2tuple --spring.cloud.stream.bindings.output.contentType=application/json --spring.cloud.stream.bindings.output.destination=tuple2gem
 ```
 
 ### 2-3-3. Start GemFire Sink
 
 ```
 java -jar gemfire-sink-rabbit-1.0.0.RC1.jar --server.port=9999 --gemfire.region.region-name=RegionRaw --gemfire.json=true --gemfire.key-expression="payload.getField('uuid')" --spring.cloud.stream.bindings.input.destination=tuple2gem
+```
 
+### 2-3-4. Start Log Sink
+
+```
+java -jar log-sink-rabbit-1.0.0.RC1.jar --server.port=9009 --spring.cloud.stream.bindings.input.destination=tuple2gem
 ```
 
 ## 2-4. Start Spring Cloud Stream Applications to receive data from GemFire and send to Stomp(WebSocket)
@@ -199,14 +204,8 @@ java -jar gemfire-sink-rabbit-1.0.0.RC1.jar --server.port=9999 --gemfire.region.
 java -jar gemfire-source-rabbit-1.0.0.RC1.jar --server.port=8000 --gemfire.cacheEventExpression=newValue --gemfire.region.region-name=RegionTopTen --spring.cloud.stream.bindings.output.destination=topten
 ```
 
-####
+### 2-4-2 Start Stomp Sink
 
 ```
-java -jar StompSink-0.0.1-SNAPSHOT.jar --server.port=8008 --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=topten
-```
-
-### 2-4-3. Start Log Sink
-
-```
-java -jar log-sink-rabbit-1.0.0.RC1.jar --server.port=8888 --spring.cloud.stream.bindings.input.destination=topten
+java -jar spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --server.port=8888 --stomp.topic=topten --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=topten
 ```
