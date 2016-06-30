@@ -153,3 +153,60 @@ stream create gem2stomp --definition "gemfire --gemfire.region.region-name=Regio
 
 ```
 ```
+
+#2 Local deployment without Spring Cloud Data Flow Server
+
+## 2-1. Prerequisites for Local Deployment
+
+* [Maven](http://brewformulas.org/Maven)
+* [RabbitMQ](http://brewformulas.org/Rabbitmq)
+
+## 2-2. Start GemFire
+
+### 2-2-1. Start GemFire as Spring Boot App
+
+```
+java -jar target/spring-boot-gemfire-server-0.0.1-SNAPSHOT.jar
+```
+
+## 2-3. Start Spring Cloud Stream Applications to receive data from HTTP and send to GemFire
+
+### 2-3-1. Start Http Source
+
+```
+java -jar http-source-rabbit-1.0.0.RC1.jar --server.port=9000 --spring.cloud.stream.bindings.output.destination=http2tuple
+
+```
+
+### 2-3-2. Start Flat2Tuple Processor
+
+```
+java -jar target/spring-cloud-stream-processor-flat2tuple-0.0.1-SNAPSHOT.jar --server.port=9090 --outputType=application/json --spring.cloud.stream.bindings.output.destination=tuple2gem --spring.cloud.stream.bindings.input.destination=http2tuple
+```
+
+### 2-3-3. Start GemFire Sink
+
+```
+java -jar gemfire-sink-rabbit-1.0.0.RC1.jar --server.port=9999 --gemfire.region.region-name=RegionRaw --gemfire.json=true --gemfire.key-expression="payload.getField('uuid')" --spring.cloud.stream.bindings.input.destination=tuple2gem
+
+```
+
+## 2-4. Start Spring Cloud Stream Applications to receive data from GemFire and send to Stomp(WebSocket)
+
+### 2-4-1. Start GemFire Source
+
+```
+java -jar gemfire-source-rabbit-1.0.0.RC1.jar --server.port=8000 --gemfire.cacheEventExpression=newValue --gemfire.region.region-name=RegionTopTen --spring.cloud.stream.bindings.output.destination=topten
+```
+
+####
+
+```
+java -jar StompSink-0.0.1-SNAPSHOT.jar --server.port=8008 --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=topten
+```
+
+### 2-4-3. Start Log Sink
+
+```
+java -jar log-sink-rabbit-1.0.0.RC1.jar --server.port=8888 --spring.cloud.stream.bindings.input.destination=topten
+```
