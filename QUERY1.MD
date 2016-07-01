@@ -163,7 +163,7 @@ mvn clean package
 ### 1-7-2. Run
 
 ```
-java -jar target/FlatFileReader-0.1.0-jar-with-dependencies.jar --file=./data/sample_data.csv --url http://localhost:9000 --mode=bulk --lines-per-second=1
+java -jar target/FlatFileReader-0.1.0-jar-with-dependencies.jar --file=./data/sample_data.csv --url http://localhost:9000 --mode=bulk --interval=200
 ```
 
 ## 1-8. Start the Monitoring GUI App
@@ -291,7 +291,7 @@ mvn clean package
 ### 2-5-2. Run
 
 ```
-java -jar target/FlatFileReader-0.1.0-jar-with-dependencies.jar --file=./data/sample_data.csv --url http://localhost:9000 --mode=bulk --lines-per-second=1
+java -jar target/FlatFileReader-0.1.0-jar-with-dependencies.jar --file=./data/sample_data.csv --url http://localhost:9000 --mode=bulk --interval=200
 ```
 
 ## 2-6. Start the Monitoring GUI App
