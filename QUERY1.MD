@@ -149,12 +149,24 @@ stream create http2gem --definition "http --server.port=9000 | flat2tuple --outp
 stream create gem2stomp --definition "gemfire --gemfire.region.region-name=RegionTopTen | stomp --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE" --deploy
 ```
 
-## 1-7. Start Browser
+## 1-7. Start the Monitoring GUI App
+
+### 1-7-1. Download
 
 ```
+git clone https://github.com/komushi/ng-topten-taxi-zones
 ```
 
-#2 Local deployment without Spring Cloud Data Flow Server
+### 1-7-2. Build & Start GUI
+
+```
+cd ng-topten-taxi-zones
+bower install
+npm install -g live-server
+live-server
+```
+
+# 2. Local deployment without Spring Cloud Data Flow Server
 
 ## 2-1. Prerequisites for Local Deployment
 
@@ -208,4 +220,21 @@ java -jar gemfire-source-rabbit-1.0.0.RC1.jar --server.port=8000 --gemfire.cache
 
 ```
 java -jar spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --server.port=8888 --stomp.topic=topten --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=topten
+```
+
+## 2-5. Start the Monitoring GUI App
+
+### 2-5-1. Download
+
+```
+git clone https://github.com/komushi/ng-topten-taxi-zones
+```
+
+### 2-5-2. Build & Start GUI
+
+```
+cd ng-topten-taxi-zones
+bower install
+npm install -g live-server
+live-server
 ```
