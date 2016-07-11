@@ -75,7 +75,7 @@ The attribute “delay” captures the time delay between reading the input even
 
 The cells for this query are squares of 500 m X 500 m. The cell grid starts with cell 1.1, located at 41.474937, -74.913585 (in Barryville). The coordinate 41.474937, -74.913585 marks the center of the first cell. Cell numbers increase towards the east and south, with the shift to east being the first and the shift to south the second component of the cell, i.e., cell 3.7 is 2 cells east and 6 cells south of cell 1.1. The overall grid expands 150km south and 150km east from cell 1.1 with the cell 300.300 being the last cell in the grid. All trips starting or ending outside this area are treated as outliers and must not be considered in the result computation.
 
-## [Query 1 Solution](QUERY1.MD)
+## [Query 1 Solution](/QUERY1)
 
 
 ## Query 2: Profitable Areas
