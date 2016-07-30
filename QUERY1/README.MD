@@ -51,7 +51,7 @@ java -jar spring-boot-gemfire-server-0.0.1-SNAPSHOT.jar
 ### 1-3-2. Start Http Source
 
 ```
-java -jar http-source-rabbit-1.0.0.RC1.jar --server.port=9000 --spring.cloud.stream.bindings.output.destination=http2tuple
+java -jar http-source-rabbit-1.0.2.RELEASE.jar --server.port=9000 --spring.cloud.stream.bindings.output.destination=http2tuple
 ```
 
 ### 1-3-3. Start Flat2Tuple Processor
@@ -63,13 +63,13 @@ java -jar spring-cloud-stream-processor-flat2tuple-0.0.1-SNAPSHOT.jar --server.p
 ### 1-3-4. Start GemFire Sink
 
 ```
-java -jar gemfire-sink-rabbit-1.0.0.RC1.jar --server.port=9999 --gemfire.region.region-name=RegionRaw --gemfire.json=true --gemfire.key-expression="payload.getField('uuid')" --spring.cloud.stream.bindings.input.destination=tuple2gem
+java -jar gemfire-sink-rabbit-1.0.2.RELEASE.jar --server.port=9999 --gemfire.region.region-name=RegionRaw --gemfire.json=true --gemfire.key-expression="payload.getField('uuid')" --spring.cloud.stream.bindings.input.destination=tuple2gem
 ```
 
 ### 1-3-5. Start GemFire Source
 
 ```
-java -jar gemfire-source-rabbit-1.0.0.RC1.jar --server.port=8000 --gemfire.cacheEventExpression=newValue --gemfire.region.region-name=RegionTopTen --spring.cloud.stream.bindings.output.destination=topten
+java -jar gemfire-source-rabbit-1.0.2.RELEASE.jar --server.port=8000 --gemfire.cacheEventExpression=newValue --gemfire.region.region-name=RegionTopTen --spring.cloud.stream.bindings.output.destination=topten
 ```
 
 ### 1-3-6 Start Stomp Sink
@@ -138,10 +138,10 @@ java -jar spring-boot-gemfire-server-0.0.1-SNAPSHOT.jar
 
 ### 2-3-1. Start Http Source
 
-http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/http-source-rabbit/1.0.0.RC1/http-source-rabbit-1.0.0.RC1.jar
+http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/http-source-rabbit/1.0.2.RELEASE/http-source-rabbit-1.0.2.RELEASE.jar
 
 ```
-java -jar http-source-rabbit-1.0.0.RC1.jar --server.port=9000 --spring.cloud.stream.bindings.output.destination=http2tuple
+java -jar http-source-rabbit-1.0.2.RELEASE.jar --server.port=9000 --spring.cloud.stream.bindings.output.destination=http2tuple
 ```
 
 ### 2-3-2. Start Flat2Tuple Processor
@@ -154,28 +154,28 @@ java -jar spring-cloud-stream-processor-flat2tuple-0.0.1-SNAPSHOT.jar --server.p
 
 ### 2-3-3. Start GemFire Sink
 
-http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/gemfire-sink-rabbit/1.0.0.RC1/gemfire-sink-rabbit-1.0.0.RC1.jar
+http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/gemfire-sink-rabbit/1.0.2.RELEASE/gemfire-sink-rabbit-1.0.2.RELEASE.jar
 
 ```
-java -jar gemfire-sink-rabbit-1.0.0.RC1.jar --server.port=9999 --gemfire.region.region-name=RegionRaw --gemfire.json=true --gemfire.key-expression="payload.getField('uuid')" --spring.cloud.stream.bindings.input.destination=tuple2gem
+java -jar gemfire-sink-rabbit-1.0.2.RELEASE.jar --server.port=9999 --gemfire.region.region-name=RegionRaw --gemfire.json=true --gemfire.key-expression="payload.getField('uuid')" --spring.cloud.stream.bindings.input.destination=tuple2gem
 ```
 
 ### 2-3-4. Start Log Sink - Optional
 
-http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/log-sink-rabbit/1.0.0.RC1/log-sink-rabbit-1.0.0.RC1.jar
+http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/log-sink-rabbit/1.0.2.RELEASE/log-sink-rabbit-1.0.2.RELEASE.jar
 
 ```
-java -jar log-sink-rabbit-1.0.0.RC1.jar --server.port=9009 --spring.cloud.stream.bindings.input.destination=tuple2gem
+java -jar log-sink-rabbit-1.0.2.RELEASE.jar --server.port=9009 --spring.cloud.stream.bindings.input.destination=tuple2gem
 ```
 
 ## 2-4. Start Spring Cloud Stream Applications to receive data from GemFire and send to Stomp(WebSocket)
 
 ### 2-4-1. Start GemFire Source
 
-http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/gemfire-source-rabbit/1.0.0.RC1/gemfire-source-rabbit-1.0.0.RC1.jar
+http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/gemfire-source-rabbit/1.0.2.RELEASE/gemfire-source-rabbit-1.0.2.RELEASE.jar
 
 ```
-java -jar gemfire-source-rabbit-1.0.0.RC1.jar --server.port=8000 --gemfire.cacheEventExpression=newValue --gemfire.region.region-name=RegionTopTen --spring.cloud.stream.bindings.output.destination=topten
+java -jar gemfire-source-rabbit-1.0.2.RELEASE.jar --server.port=8000 --gemfire.cacheEventExpression=newValue --gemfire.region.region-name=RegionTopTen --spring.cloud.stream.bindings.output.destination=topten
 ```
 
 ### 2-4-2 Start Stomp Sink
@@ -232,8 +232,8 @@ http://localhost:8080/#/stompgrid
 ## 3-1. Prerequisites for Local Deployment
 
 * [Maven](http://brewformulas.org/Maven)
-* [Spring Cloud Data Flow Local Server](http://repo.spring.io/libs-milestone/org/springframework/cloud/spring-cloud-dataflow-server-local/1.0.0.RC1/spring-cloud-dataflow-server-local-1.0.0.RC1.jar)
-* [Spring Cloud Data Flow Shell](http://repo.spring.io/libs-milestone/org/springframework/cloud/spring-cloud-dataflow-shell/1.0.0.RC1/spring-cloud-dataflow-shell-1.0.0.RC1.jar)
+* [Spring Cloud Data Flow Local Server](http://repo.spring.io/libs-milestone/org/springframework/cloud/spring-cloud-dataflow-server-local/1.0.0.RELEASE/spring-cloud-dataflow-server-local-1.0.0.RELEASE.jar)
+* [Spring Cloud Data Flow Shell](http://repo.spring.io/libs-milestone/org/springframework/cloud/spring-cloud-dataflow-shell/1.0.0.RELEASE/spring-cloud-dataflow-shell-1.0.0.RELEASE.jar)
 * [RabbitMQ](http://brewformulas.org/Rabbitmq)
 
 ### 3-1-1. Start RabbitMQ
@@ -247,13 +247,13 @@ rabbitmq-server
 ### 3-2-2. Start Data Flow Server
 
 ```
-java -jar spring-cloud-dataflow-server-local-1.0.0.RC1.jar --binder=rabbit
+java -jar spring-cloud-dataflow-server-local-1.0.0.RELEASE.jar --binder=rabbit
 ```
 
 ### 3-2-3. Start Data Flow Shell
 
 ```
-java -jar spring-cloud-dataflow-shell-1.0.0.RC1.jar
+java -jar spring-cloud-dataflow-shell-1.0.0.RELEASE.jar
 ```
 
 ## 3-3. Register Spring Cloud Stream Apps to Data Flow Server (Sending data to GemFire)
@@ -265,7 +265,7 @@ In Dataflow Shell
 ```
 app unregister --name http:source
 
-app register --name http --type source --uri http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/http-source-rabbit/1.0.0.RC1/http-source-rabbit-1.0.0.RC1.jar
+app register --name http --type source --uri http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/http-source-rabbit/1.0.2.RELEASE/http-source-rabbit-1.0.2.RELEASE.jar
 ```
 
 Or you can build the HTTP Source from source code.
@@ -286,7 +286,7 @@ https://github.com/komushi/spring-cloud-stream-processor-flat2tuple
 ```
 app unregister --name gemfire:sink
 
-app register --name gemfire --type sink --uri http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/gemfire-sink-rabbit/1.0.0.RC1/gemfire-sink-rabbit-1.0.0.RC1.jar
+app register --name gemfire --type sink --uri http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/gemfire-sink-rabbit/1.0.2.RELEASE/gemfire-sink-rabbit-1.0.2.RELEASE.jar
 ```
 
 Or you can build the GemFire Sink from source code.
@@ -299,7 +299,7 @@ https://github.com/spring-cloud/spring-cloud-stream-app-starters
 ```
 app unregister --name gemfire:source
 
-app register --name gemfire --type source --uri http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/gemfire-source-rabbit/1.0.0.RC1/gemfire-source-rabbit-1.0.0.RC1.jar
+app register --name gemfire --type source --uri http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/gemfire-source-rabbit/1.0.2.RELEASE/gemfire-source-rabbit-1.0.2.RELEASE.jar
 ```
 
 Or you can build the GemFire Sink from source code.
