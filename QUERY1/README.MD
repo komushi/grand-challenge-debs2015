@@ -51,31 +51,49 @@ java -jar spring-boot-gemfire-server-0.0.1-SNAPSHOT.jar
 ### 1-3-2. Start Http Source
 
 ```
-java -jar http-source-rabbit-1.0.2.RELEASE.jar --server.port=9000 --spring.cloud.stream.bindings.output.destination=http2tuple
+java -jar http-source-rabbit-1.0.2.RELEASE.jar --server.port=9000 --spring.cloud.stream.bindings.output.destination=http_raw
 ```
 
 ### 1-3-3. Start Flat2Tuple Processor
 
 ```
-java -jar spring-cloud-stream-processor-flat2tuple-0.0.1-SNAPSHOT.jar --server.port=9090 --spring.cloud.stream.bindings.input.destination=http2tuple --spring.cloud.stream.bindings.output.contentType=application/json --spring.cloud.stream.bindings.output.destination=tuple2gem
+java -jar spring-cloud-stream-processor-flat2tuple-0.0.1-SNAPSHOT.jar --spring.cloud.stream.bindings.input.destination=http_raw --spring.cloud.stream.bindings.input.group=transform_tuple --spring.cloud.stream.bindings.output.contentType=application/json --spring.cloud.stream.bindings.output.destination=transform_tuple --server.port=9010
+```
+
+To imporve the process performance by adding more instances:
+
+```
+java -jar spring-cloud-stream-processor-flat2tuple-0.0.1-SNAPSHOT.jar --spring.cloud.stream.bindings.input.destination=http_raw --spring.cloud.stream.bindings.input.group=transform_tuple --spring.cloud.stream.bindings.output.contentType=application/json --spring.cloud.stream.bindings.output.destination=transform_tuple --server.port=9011
 ```
 
 ### 1-3-4. Start GemFire Sink
 
 ```
-java -jar gemfire-sink-rabbit-1.0.2.RELEASE.jar --server.port=9999 --gemfire.region.region-name=RegionRaw --gemfire.json=true --gemfire.key-expression="payload.getField('uuid')" --spring.cloud.stream.bindings.input.destination=tuple2gem
+java -jar gemfire-sink-rabbit-1.0.2.RELEASE.jar --gemfire.region.region-name=RegionRaw --gemfire.json=true --gemfire.key-expression="payload.getField('uuid')" --spring.cloud.stream.bindings.input.destination=transform_tuple --spring.cloud.stream.bindings.input.group=gemfire_rawjson --server.port=9020
+```
+
+To imporve the process performance by adding more instances:
+
+```
+java -jar gemfire-sink-rabbit-1.0.2.RELEASE.jar --gemfire.region.region-name=RegionRaw --gemfire.json=true --gemfire.key-expression="payload.getField('uuid')" --spring.cloud.stream.bindings.input.destination=transform_tuple --spring.cloud.stream.bindings.input.group=gemfire_rawjson --server.port=9021
 ```
 
 ### 1-3-5. Start GemFire Source
 
 ```
-java -jar gemfire-source-rabbit-1.0.2.RELEASE.jar --server.port=8000 --gemfire.cacheEventExpression=newValue --gemfire.region.region-name=RegionTopTen --spring.cloud.stream.bindings.output.destination=topten
+java -jar gemfire-source-rabbit-1.0.2.RELEASE.jar --gemfire.cacheEventExpression=newValue --gemfire.region.region-name=RegionTopTen --spring.cloud.stream.bindings.output.destination=gemfire_topjson --server.port=9030
 ```
 
 ### 1-3-6 Start Stomp Sink
 
 ```
-java -jar spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --server.port=8888 --stomp.topic=topten --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=topten
+java -jar spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --stomp.topic=topten --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=gemfire_topjson --spring.cloud.stream.bindings.input.group=stomp_topjson0 --server.port=9040
+```
+
+To imporve the process performance by adding more instances(**Different groups specified as scale-out WebSocket/Stomp brokers are needed.** To use multiple WebSocket brokers we might need a LB/Proxy for clients.):
+
+```
+java -jar spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --stomp.topic=topten --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=gemfire_topjson --spring.cloud.stream.bindings.input.group=stomp_topjson1 --server.port=9041
 ```
 
 ### 1-3-7. Run the Data Loader(s)
@@ -146,18 +164,33 @@ java -jar http-source-rabbit-1.0.2.RELEASE.jar --server.port=9000 --spring.cloud
 
 ### 2-3-2. Start Flat2Tuple Processor
 
-https://rawgit.com/komushi/spring-cloud-stream/master/spring-cloud-stream-processor-flat2tuple-0.0.1-SNAPSHOT.jar
+```
+git clone https://github.com/komushi/spring-cloud-stream-processor-flat2tuple.git
+cd spring-cloud-stream-processor-flat2tuple
+mvn clean package
+```
 
 ```
-java -jar spring-cloud-stream-processor-flat2tuple-0.0.1-SNAPSHOT.jar --server.port=9090 --spring.cloud.stream.bindings.input.destination=http2tuple --spring.cloud.stream.bindings.output.contentType=application/json --spring.cloud.stream.bindings.output.destination=tuple2gem
+java -jar spring-cloud-stream-processor-flat2tuple-0.0.1-SNAPSHOT.jar --spring.cloud.stream.bindings.input.destination=http_raw --spring.cloud.stream.bindings.input.group=transform_tuple --spring.cloud.stream.bindings.output.contentType=application/json --spring.cloud.stream.bindings.output.destination=transform_tuple --server.port=9010
 ```
+
+To imporve the process performance by adding more instances:
+
+```
+java -jar spring-cloud-stream-processor-flat2tuple-0.0.1-SNAPSHOT.jar --spring.cloud.stream.bindings.input.destination=http_raw --spring.cloud.stream.bindings.input.group=transform_tuple --spring.cloud.stream.bindings.output.contentType=application/json --spring.cloud.stream.bindings.output.destination=transform_tuple --server.port=9011
+```
+
 
 ### 2-3-3. Start GemFire Sink
 
-http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/gemfire-sink-rabbit/1.0.2.RELEASE/gemfire-sink-rabbit-1.0.2.RELEASE.jar
+```
+java -jar gemfire-sink-rabbit-1.0.2.RELEASE.jar --gemfire.region.region-name=RegionRaw --gemfire.json=true --gemfire.key-expression="payload.getField('uuid')" --spring.cloud.stream.bindings.input.destination=transform_tuple --spring.cloud.stream.bindings.input.group=gemfire_rawjson --server.port=9020
+```
+
+To imporve the process performance by adding more instances:
 
 ```
-java -jar gemfire-sink-rabbit-1.0.2.RELEASE.jar --server.port=9999 --gemfire.region.region-name=RegionRaw --gemfire.json=true --gemfire.key-expression="payload.getField('uuid')" --spring.cloud.stream.bindings.input.destination=tuple2gem
+java -jar gemfire-sink-rabbit-1.0.2.RELEASE.jar --gemfire.region.region-name=RegionRaw --gemfire.json=true --gemfire.key-expression="payload.getField('uuid')" --spring.cloud.stream.bindings.input.destination=transform_tuple --spring.cloud.stream.bindings.input.group=gemfire_rawjson --server.port=9021
 ```
 
 ### 2-3-4. Start Log Sink - Optional
@@ -180,10 +213,20 @@ java -jar gemfire-source-rabbit-1.0.2.RELEASE.jar --server.port=8000 --gemfire.c
 
 ### 2-4-2 Start Stomp Sink
 
-https://rawgit.com/komushi/spring-cloud-stream/master/spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar
+```
+git clone https://github.com/komushi/spring-cloud-stream-sink-stomp.git
+cd spring-cloud-stream-sink-stomp
+mvn clean package
+```
 
 ```
-java -jar spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --server.port=8888 --stomp.topic=topten --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=topten
+java -jar target/spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --stomp.topic=topten --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=gemfire_topjson --spring.cloud.stream.bindings.input.group=stomp_topjson0 --server.port=9040
+```
+
+To imporve the process performance by adding more instances(**Different groups specified as scale-out WebSocket/Stomp brokers are needed.** To use multiple WebSocket brokers we might need a LB/Proxy for clients.):
+
+```
+java -jar spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --stomp.topic=topten --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=gemfire_topjson --spring.cloud.stream.bindings.input.group=stomp_topjson1 --server.port=9041
 ```
 
 ## 2-5. Data Loader - FlatFileReader
@@ -225,9 +268,10 @@ In the browser of the following url, click 'Connect' when ready.
 
 http://localhost:8080/#/stompgrid
 
-# Option 3. Local Deployment with Spring Cloud Data Flow Server
+# Option 3. Local Deployment with Spring Cloud Dataflow Server
 
-## TODO: Local Deployment Architecture
+## TODO: Spring Cloud Dataflow Deployment Architecture
+## TODO: scale-up with multiple stream applications
 
 ## 3-1. Prerequisites for Local Deployment
 
