@@ -51,7 +51,7 @@ java -jar spring-boot-gemfire-server-0.0.1-SNAPSHOT.jar
 ### 1-3-2. Start Http Source
 
 ```
-java -jar http-source-rabbit-1.0.2.RELEASE.jar --server.port=9000 --spring.cloud.stream.bindings.output.destination=http_raw
+java -jar http-source-rabbit-1.0.2.RELEASE.jar --spring.cloud.stream.bindings.output.destination=http_raw --server.port=9000
 ```
 
 ### 1-3-3. Start Flat2Tuple Processor
@@ -87,13 +87,13 @@ java -jar gemfire-source-rabbit-1.0.2.RELEASE.jar --gemfire.cacheEventExpression
 ### 1-3-6 Start Stomp Sink
 
 ```
-java -jar spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --stomp.topic=topten --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=gemfire_topjson --spring.cloud.stream.bindings.input.group=stomp_topjson0 --server.port=9040
+java -jar spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --stomp.topic=toprouteus --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=gemfire_topjson --spring.cloud.stream.bindings.input.group=stomp_topjson0 --server.port=9040
 ```
 
 To imporve the process performance by adding more instances(**Different groups specified as scale-out WebSocket/Stomp brokers are needed.** To use multiple WebSocket brokers we might need a LB/Proxy for clients.):
 
 ```
-java -jar spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --stomp.topic=topten --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=gemfire_topjson --spring.cloud.stream.bindings.input.group=stomp_topjson1 --server.port=9041
+java -jar spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --stomp.topic=toprouteus --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=gemfire_topjson --spring.cloud.stream.bindings.input.group=stomp_topjson1 --server.port=9041
 ```
 
 ### 1-3-7. Run the Data Loader(s)
@@ -208,7 +208,7 @@ java -jar log-sink-rabbit-1.0.2.RELEASE.jar --server.port=9009 --spring.cloud.st
 http://repo.spring.io/libs-milestone/org/springframework/cloud/stream/app/gemfire-source-rabbit/1.0.2.RELEASE/gemfire-source-rabbit-1.0.2.RELEASE.jar
 
 ```
-java -jar gemfire-source-rabbit-1.0.2.RELEASE.jar --server.port=8000 --gemfire.cacheEventExpression=newValue --gemfire.region.region-name=RegionTopTen --spring.cloud.stream.bindings.output.destination=topten
+java -jar gemfire-source-rabbit-1.0.2.RELEASE.jar --server.port=8000 --gemfire.cacheEventExpression=newValue --gemfire.region.region-name=RegionTopTen --spring.cloud.stream.bindings.output.destination=gemfire_topjson
 ```
 
 ### 2-4-2 Start Stomp Sink
@@ -220,13 +220,13 @@ mvn clean package
 ```
 
 ```
-java -jar target/spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --stomp.topic=topten --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=gemfire_topjson --spring.cloud.stream.bindings.input.group=stomp_topjson0 --server.port=9040
+java -jar target/spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --stomp.topic=toprouteus --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=gemfire_topjson --spring.cloud.stream.bindings.input.group=stomp_topjson0 --server.port=9040
 ```
 
 To imporve the process performance by adding more instances(**Different groups specified as scale-out WebSocket/Stomp brokers are needed.** To use multiple WebSocket brokers we might need a LB/Proxy for clients.):
 
 ```
-java -jar spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --stomp.topic=topten --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=gemfire_topjson --spring.cloud.stream.bindings.input.group=stomp_topjson1 --server.port=9041
+java -jar spring-cloud-stream-sink-stomp-0.0.1-SNAPSHOT.jar --stomp.topic=toprouteus --stomp.withSockJS=true --logging.level.io.pivotal.spring.cloud.stream.sink=TRACE --spring.cloud.stream.bindings.input.destination=gemfire_topjson --spring.cloud.stream.bindings.input.group=stomp_topjson1 --server.port=9041
 ```
 
 ## 2-5. Data Loader - FlatFileReader
